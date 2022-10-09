@@ -18,13 +18,13 @@ import { BigInt } from "@graphprotocol/graph-ts";
 // STATE CHANGING
 // // // // // // // // // // // // // // // // // // // //
 
-function _getStreamId(event: any): string {
+function _getStreamId(
+  fromAddress: string,
+  toAddress: string,
+  token: string
+): string {
   return (
-    event.params.fromAddress.toString() +
-    "-" +
-    event.params.toAddress.toString() +
-    "-" +
-    event.params.token.toString()
+    fromAddress.toString() + "-" + toAddress.toString() + "-" + token.toString()
   );
 }
 
@@ -32,10 +32,22 @@ export function handleCreatedSubscriptionFlow(
   event: CreatedSubscriptionFlowEvent
 ): void {
   // Set up single flow
-  let subscriptionFlowEntity = SubscriptionFlow.load(_getStreamId(event));
+  let subscriptionFlowEntity = SubscriptionFlow.load(
+    _getStreamId(
+      event.params.fromAddress.toString(),
+      event.params.toAddress.toString(),
+      event.params.token.toString()
+    )
+  );
 
   if (subscriptionFlowEntity == null) {
-    subscriptionFlowEntity = new SubscriptionFlow(_getStreamId(event));
+    subscriptionFlowEntity = new SubscriptionFlow(
+      _getStreamId(
+        event.params.fromAddress.toString(),
+        event.params.toAddress.toString(),
+        event.params.token.toString()
+      )
+    );
     subscriptionFlowEntity.sourceAddress = event.params.fromAddress;
     subscriptionFlowEntity.destinationAddress = event.params.toAddress;
     subscriptionFlowEntity.token = event.params.token;
@@ -69,10 +81,16 @@ export function handleDeletedSubscriptionFlow(
   event: DeletedSubscriptionFlowEvent
 ): void {
   // (address,indexed address,indexed address,indexed address)
-  let subscriptionFlowEntity = SubscriptionFlow.load(_getStreamId(event));
+  const streamFlowId = _getStreamId(
+    event.params.fromAddress.toString(),
+    event.params.toAddress.toString(),
+    event.params.token.toString()
+  );
+
+  let subscriptionFlowEntity = SubscriptionFlow.load(streamFlowId);
 
   if (subscriptionFlowEntity == null) {
-    subscriptionFlowEntity = new SubscriptionFlow(_getStreamId(event));
+    subscriptionFlowEntity = new SubscriptionFlow(streamFlowId);
   }
 
   // Set up overall flow
