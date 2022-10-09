@@ -1,0 +1,81 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: StreamController
+    network: goerli
+    source:
+      address: "0x2943763bdB0d62B5947582c48E8eE90D975c1798"
+      abi: StreamController
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - DappStatus
+        - Stream
+        - RegisteredStreamer
+        - AggregatedSubscriptionFlow
+        - ActiveFlow
+      abis:
+        - name: StreamController
+          file: ./abis/StreamController.json
+      eventHandlers:
+        - event: UpdatedStreamToken(indexed address,indexed address)
+          handler: handleUpdatedStreamToken
+
+        - event: UpdatedSuperTokenFactory(indexed address,indexed address)
+          handler: handleUpdatedSuperTokenFactory
+
+        - event: UpdatedSubscriptionHandler(indexed address,indexed address)
+          handler: handleUpdatedSubscriptionHandler
+
+        - event: RegisteredStreamer(indexed address,indexed address,indexed string,string)
+          handler: handleRegisteredStreamer
+
+        - event: StreamStarted(indexed address,indexed uint256,indexed int96)
+          handler: handleStreamStarted
+
+        - event: StreamEnded(indexed address,indexed uint256)
+          handler: handleStreamEnded
+
+        - event: StartedWatchingStream(indexed address,indexed address)
+          handler: handleStartedWatchingStream
+
+        - event: StoppedWatchingStream(indexed address,indexed address)
+          handler: handleStoppedWatchingStream
+      file: ./src/stream-controller.ts
+  - kind: ethereum
+    name: SubscriptionHandler
+    network: goerli
+    source:
+      address: "0xD7Fc43Cd6336E1e289dFEBEf4C3325018A239056"
+      abi: SubscriptionHandler
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - DappStatus
+        - Stream
+        - RegisteredStreamer
+        - AggregatedSubscriptionFlow
+        - ActiveFlow
+      abis:
+        - name: SubscriptionHandler
+          file: ./abis/SubscriptionHandler.json
+      eventHandlers:
+        - event: ChangedController(indexed address,indexed address,indexed address)
+          handler: handleChangedController
+
+        - event: ChangedStreamHost(indexed address,indexed address,indexed address)
+          handler: handleChangedStreamHost
+
+        - event: CreatedSubscriptionFlow(address,indexed address,indexed address,indexed address,int96)
+          handler: handleCreatedSubscriptionFlow
+
+        - event: DeletedSubscriptionFlow(address,indexed address,indexed address,indexed address)
+          handler: handleDeletedSubscriptionFlow
+
+      file: ./src/subscription-handler.ts

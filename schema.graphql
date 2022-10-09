@@ -1,0 +1,34 @@
+type DappStatus @entity {
+  id: ID!
+  address: Bytes! # address
+  isPaused: Boolean!
+}
+
+type Stream @entity {
+  id: ID!
+  isActive: Boolean!
+  streamerAddress: Bytes! # address
+  flowRateCost: BigInt! # int96
+}
+
+type Streamer @entity {
+  id: ID!
+  streamerAddress: Bytes! # address
+  tokenAddress: Bytes! # address
+  streamerName: String! # string
+}
+
+type AggregatedSubscriptionFlow @entity {
+  id: ID!
+  streamerAddress: Bytes! # address
+  token: Bytes! # address
+  flowRate: BigInt! # int96
+}
+
+type ActiveFlow @entity {
+  id: ID!
+  streamerAddress: Bytes! # address
+  watcherAddress: Bytes! # address
+  token: Bytes! # address
+  flowRate: BigInt! # int96
+}

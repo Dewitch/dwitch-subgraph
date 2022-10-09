@@ -1,0 +1,10 @@
+{
+  "goerli": {
+    "StreamController": {
+      "address": "0x2943763bdB0d62B5947582c48E8eE90D975c1798"
+    },
+    "SubscriptionHandler": {
+      "address": "0xD7Fc43Cd6336E1e289dFEBEf4C3325018A239056"
+    }
+  }
+}
