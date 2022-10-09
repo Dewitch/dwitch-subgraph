@@ -10,11 +10,11 @@ import {
   StoppedWatchingStream as StoppedWatchingStreamEvent,
 } from "../generated/StreamController/StreamController";
 import {
-  ActiveFlow,
   AggregatedSubscriptionFlow,
   DappStatus,
   Stream,
   Streamer,
+  SubscriptionFlow,
 } from "../generated/schema";
 
 // // // // // // // // // // // // // // // // // // // //

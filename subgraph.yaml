@@ -13,11 +13,11 @@ dataSources:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - DappStatus
-        - Stream
-        - RegisteredStreamer
         - AggregatedSubscriptionFlow
-        - ActiveFlow
+        - DappStatus
+        - RegisteredStreamer
+        - Stream
+        - SubscriptionFlow
       abis:
         - name: StreamController
           file: ./abis/StreamController.json
@@ -57,11 +57,11 @@ dataSources:
       apiVersion: 0.0.6
       language: wasm/assemblyscript
       entities:
-        - DappStatus
-        - Stream
-        - RegisteredStreamer
         - AggregatedSubscriptionFlow
-        - ActiveFlow
+        - DappStatus
+        - RegisteredStreamer
+        - Stream
+        - SubscriptionFlow
       abis:
         - name: SubscriptionHandler
           file: ./abis/SubscriptionHandler.json

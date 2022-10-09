@@ -6,26 +6,94 @@ import {
   PauseCall as PauseEvent,
 } from "../generated/SubscriptionHandler/SubscriptionHandler";
 import {
-  ActiveFlow,
   AggregatedSubscriptionFlow,
   DappStatus,
   Stream,
   Streamer,
+  SubscriptionFlow,
 } from "../generated/schema";
+import { BigInt } from "@graphprotocol/graph-ts";
 
 // // // // // // // // // // // // // // // // // // // //
 // STATE CHANGING
 // // // // // // // // // // // // // // // // // // // //
+
+function _getStreamId(event: any): string {
+  return (
+    event.params.fromAddress.toString() +
+    "-" +
+    event.params.toAddress.toString() +
+    "-" +
+    event.params.token.toString()
+  );
+}
+
 export function handleCreatedSubscriptionFlow(
   event: CreatedSubscriptionFlowEvent
 ): void {
-  // (address,indexed address,indexed address,indexed address,int96)
+  // Set up single flow
+  let subscriptionFlowEntity = SubscriptionFlow.load(_getStreamId(event));
+
+  if (subscriptionFlowEntity == null) {
+    subscriptionFlowEntity = new SubscriptionFlow(_getStreamId(event));
+    subscriptionFlowEntity.sourceAddress = event.params.fromAddress;
+    subscriptionFlowEntity.destinationAddress = event.params.toAddress;
+    subscriptionFlowEntity.token = event.params.token;
+  }
+
+  // Update the flow
+  subscriptionFlowEntity.flowRate = event.params.flowRate;
+
+  subscriptionFlowEntity.save();
+
+  // Set up overall flow
+  const aggregateFlowId =
+    event.params.toAddress.toString() + "-" + event.params.token.toString();
+  let aggregateFlowEntity = AggregatedSubscriptionFlow.load(aggregateFlowId);
+
+  if (aggregateFlowEntity == null) {
+    aggregateFlowEntity = new AggregatedSubscriptionFlow(aggregateFlowId);
+    aggregateFlowEntity.destinationAddress = event.params.toAddress;
+    aggregateFlowEntity.token = event.params.token;
+    aggregateFlowEntity.totalFlowRate = event.params.flowRate;
+  } else {
+    aggregateFlowEntity.totalFlowRate = aggregateFlowEntity.totalFlowRate.plus(
+      event.params.flowRate
+    );
+  }
+
+  aggregateFlowEntity.save();
 }
 
 export function handleDeletedSubscriptionFlow(
   event: DeletedSubscriptionFlowEvent
 ): void {
   // (address,indexed address,indexed address,indexed address)
+  let subscriptionFlowEntity = SubscriptionFlow.load(_getStreamId(event));
+
+  if (subscriptionFlowEntity == null) {
+    subscriptionFlowEntity = new SubscriptionFlow(_getStreamId(event));
+  }
+
+  // Set up overall flow
+  const aggregateFlowId =
+    event.params.toAddress.toString() + "-" + event.params.token.toString();
+  let aggregateFlowEntity = AggregatedSubscriptionFlow.load(aggregateFlowId);
+
+  if (aggregateFlowEntity == null) {
+    aggregateFlowEntity = new AggregatedSubscriptionFlow(aggregateFlowId);
+    aggregateFlowEntity.totalFlowRate = BigInt.zero();
+  } else {
+    // Deduct from the total flow
+    aggregateFlowEntity.totalFlowRate = aggregateFlowEntity.totalFlowRate.minus(
+      subscriptionFlowEntity.flowRate
+    );
+  }
+
+  aggregateFlowEntity.save();
+
+  subscriptionFlowEntity.flowRate = BigInt.zero();
+  subscriptionFlowEntity.save();
 }
 
 // // // // // // // // // // // // // // // // // // // //

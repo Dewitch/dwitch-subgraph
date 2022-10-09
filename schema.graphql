@@ -20,15 +20,15 @@ type Streamer @entity {
 
 type AggregatedSubscriptionFlow @entity {
   id: ID!
-  streamerAddress: Bytes! # address
+  destinationAddress: Bytes! # address
   token: Bytes! # address
-  flowRate: BigInt! # int96
+  totalFlowRate: BigInt! # int96
 }
 
-type ActiveFlow @entity {
+type SubscriptionFlow @entity {
   id: ID!
-  streamerAddress: Bytes! # address
-  watcherAddress: Bytes! # address
+  sourceAddress: Bytes! # address
+  destinationAddress: Bytes! # address
   token: Bytes! # address
   flowRate: BigInt! # int96
 }
